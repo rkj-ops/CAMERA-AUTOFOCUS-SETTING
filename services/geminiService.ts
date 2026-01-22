@@ -2,11 +2,14 @@ import { GoogleGenAI } from "@google/genai";
 import { ScriptGenerationParams, OS } from "../types";
 
 const generateSystemScript = async (params: ScriptGenerationParams): Promise<string> => {
-  if (!process.env.API_KEY) {
-    throw new Error("API Key is missing. Please set the API_KEY environment variable.");
+  // Safe access to process.env to avoid ReferenceErrors in strict browser environments
+  const apiKey = typeof process !== 'undefined' && process.env ? process.env.API_KEY : undefined;
+
+  if (!apiKey) {
+    throw new Error("API Key is missing. Please set the API_KEY environment variable in your deployment settings.");
   }
 
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey });
   
   let prompt = '';
 
@@ -81,7 +84,7 @@ const generateSystemScript = async (params: ScriptGenerationParams): Promise<str
     return response.text;
   } catch (error) {
     console.error("Gemini generation error:", error);
-    throw new Error("Failed to generate script. Please try again.");
+    throw error; // Re-throw to be handled by the UI
   }
 };
 

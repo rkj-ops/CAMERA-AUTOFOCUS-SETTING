@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CameraSettings, OS, ScriptGenerationParams, ScriptType } from '../types';
 import { generateSystemScript } from '../services/geminiService';
-import { Terminal, Copy, Loader2, Save, FileCode, Command } from 'lucide-react';
+import { Terminal, Copy, Loader2, Save, FileCode, Command, AlertCircle } from 'lucide-react';
 
 interface ScriptGeneratorProps {
   currentSettings: CameraSettings;
@@ -106,8 +106,24 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({ currentSetting
       </button>
 
       {error && (
-        <div className="bg-red-900/50 border border-red-800 text-red-200 p-3 rounded-lg text-sm mb-4">
-          {error}
+        <div className="bg-red-900/50 border border-red-800 text-red-200 p-4 rounded-lg text-sm mb-4 animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-2 font-bold mb-2 text-red-100">
+            <AlertCircle className="w-5 h-5" />
+            <span>Generation Failed</span>
+          </div>
+          <p className="mb-3">{error}</p>
+          {(error.includes("API Key is missing") || error.includes("API_KEY")) && (
+            <div className="bg-gray-900/50 p-3 rounded border border-red-800/50">
+              <p className="font-semibold text-red-200 mb-2 text-xs uppercase tracking-wider">How to fix in Vercel:</p>
+              <ol className="list-decimal list-inside space-y-2 text-gray-300 text-xs">
+                <li>Go to your Vercel Project Dashboard.</li>
+                <li>Navigate to <span className="font-bold text-white">Settings</span> → <span className="font-bold text-white">Environment Variables</span>.</li>
+                <li>Add Key: <code className="bg-black px-1.5 py-0.5 rounded text-green-400 font-mono">API_KEY</code></li>
+                <li>Add Value: Your <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">Gemini API Key</a>.</li>
+                <li><span className="font-bold text-white">Redeploy</span> the application (or promote latest deployment).</li>
+              </ol>
+            </div>
+          )}
         </div>
       )}
 
@@ -128,7 +144,7 @@ export const ScriptGenerator: React.FC<ScriptGeneratorProps> = ({ currentSetting
         </div>
       )}
       
-      {!generatedScript && !isLoading && (
+      {!generatedScript && !isLoading && !error && (
         <div className="flex-1 flex items-center justify-center border border-dashed border-gray-700 rounded-lg bg-gray-800/50">
           <span className="text-gray-500 text-sm">Select options and click Generate</span>
         </div>
