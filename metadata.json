@@ -1,0 +1,8 @@
+{
+  "name": "FocusLock",
+  "description": "Webcam control utility with AI-powered system script generation for persistent focus settings.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
